@@ -1,0 +1,13 @@
+name: snakemake_vcontact2
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - clusterone = 1.0
+  - mcl = 14.137
+  - diamond = 2.0.15
+  - blast = 2.12.0
+  - vcontact2 = 0.11.3
+  - numpy = 1.20.1
+  - pandas = 1.0.5
+  - scipy = 1.6.0

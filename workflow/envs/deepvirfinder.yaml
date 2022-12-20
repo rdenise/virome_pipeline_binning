@@ -1,0 +1,8 @@
+name: snakemake_deepvirfinder
+channels:
+  - conda-forge
+  - rdenise
+dependencies:
+  - deepvirfinder = 1.0.0
+  - wget = 1.20.3
+  - tar = 1.34

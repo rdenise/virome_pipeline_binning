@@ -1,0 +1,82 @@
+# path to database sheet (TSV format, columns: database_name, path_db)
+databases: config/databases.tsv
+
+# path to database sheet (TSV format, columns: "contig_id", "viral_taxonomy", "host_taxonomy", "database")
+annotation_phages: /data/san/data0/databases/metadata_gvd_gpd_imgVr_mgv_short.tsv
+
+# path to database sheet (TSV format, columns: "id", "viral_taxonomy", "host_taxonomy", "database")
+annotation_proteins: ''
+
+# path to contigs folder
+contigs: ../paleofeces_denovo_contigs/
+
+contigs_ext: fasta
+
+# path to contigs reads folder, reads need to be format {sample}_1.fasta.gz or {sample}_2.fasta.gz
+contigs_reads: ../paleofeces_FastQ/
+
+# name of the project 
+project_name: paleofeces
+
+# path to the result folder
+output_folder: results
+
+# Blast option if not given in seeds.tsv
+default_blast_option:
+    # E-value threshold: if you want to use scientific notation put a dot after the first number (e.g. 1.e-10 not 1e-10)
+    e_val: 1.e-10
+    # coverage of the contig (between 0 and 1)
+    coverage: 0.85
+    # percentage of identity of the contig (between 0 and 1)
+    pident: 0.95
+    # Minimum coverage option: ['mean':mean of the 2 lengths (default), 'subject':subject length, 'query':query length, 'shortest':shortest length, 'longest'=longest length]
+    cov_min: query
+    # Minimum percentage of identity: ['mean':mean of the 2 lengths (default), 'subject':subject length, 'query':query length, 'shortest':shortest length, 'longest'=longest length, 'HSP'=HSP length]
+    pid_min: HSP
+    # Min length to accept partial sequences in families
+    length_min: 100
+    # Location of the nt database file in you local computer, if you don't have it a remote search will be perform just let empty if you don't have file
+    nt: "/data/san/data0/databases/blast/nt/nt"
+
+# Blast option if not given in seeds.tsv
+default_hmmer_option:
+    # E-value threshold for the full sequence: if you want to use scientific notation put a dot after the first number (e.g. 1.e-10 not 1e-10)
+    e_val_full: 1.e-3
+    # E-value threshold for per domain: if you want to use scientific notation put a dot after the first number (e.g. 1.e-10 not 1e-10)
+    e_val_dom: 0.1
+
+# Default value for plot
+default_values_plot:
+    # Color
+    color: '#131516' # This color is a dark grey similar to black
+    # Turn color of the border a darker shade infer from the background if True else set the color to black
+    colored_border: True
+    # Turn border to roundish shape
+    round_border: False
+
+# Default option for prokka
+default_prokka_option:
+    # protein database
+    protein_db: /data/san/data0/users/remi/databases/viral_proteins_plus_crass.fa
+    # hmm database:
+    hmm_db: /data/san/data0/databases/pVOGs/all_vogs.hmm
+    # Annotation mode: Archaea|Bacteria|Mitochondria|Viruses (default 'Viruses')
+    kingdom: Viruses
+
+# Default option for deepvirfinder
+default_deepvirfinder_option:
+    # predict only for sequence >= L bp
+    cutoff_length: 4000
+
+# Default option for virsorter
+default_virsorter_option:
+    # predict only for sequence >= L bp (virsorter recommend 5000)
+    cutoff_length: 4000
+
+# Default option for DRAMv
+default_dramv_option:
+    # predict only for sequence >= L bp
+    cutoff_length: 1000
+
+# Location of the IPhop database, if not existing will create it
+iphop_db: /data/san/data0/databases/iPHoP

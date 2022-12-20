@@ -1,0 +1,7 @@
+name: snakemake_prokka
+channels:
+  - conda-forge
+  - rdenise
+  - bioconda
+dependencies:
+  - prokka = 1.14.6_modif

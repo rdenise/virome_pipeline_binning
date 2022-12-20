@@ -1,0 +1,6 @@
+name: snakemake_virsorter
+channels:
+  - conda-forge
+  - bioconda
+dependencies:
+  - virsorter = 2.2.3

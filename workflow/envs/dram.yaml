@@ -1,0 +1,10 @@
+name: snakemake_dram
+channels:
+  - rdenise
+  - conda-forge
+  - bioconda
+dependencies:
+  - dram = 1.3_fix
+  - biopython = 1.79
+  - pandas = 1.3.2
+  - scikit-bio = 0.5.6
