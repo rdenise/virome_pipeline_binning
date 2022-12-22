@@ -54,6 +54,9 @@ def parse_args():
     )
     parser.add_argument(
         "--outfmt", help="output blast format", type=str, default=snakemake.params.outfmt
+    )
+    parser.add_argument(
+        "--max_length", help="max length of the sequence", type=str, default=snakemake.params.max_len
     )    
     parser.add_argument(
         "--database",
@@ -86,7 +89,7 @@ def main(args):
     record_iter = SeqIO.parse(open(args.in_fasta_file), "fasta")
     files_to_run = []
 
-    for i, batch in enumerate(batch_iterator(record_iter, args.contigs_per_file)):
+    for i, batch in enumerate(batch_iterator(record_iter, args.contigs_per_file, args.max_length)):
         try:
             group_name = f"group_{i+1}"
             dir_name = f"{args.tmp_dir}/{group_name}"
@@ -140,16 +143,19 @@ def run_job(group_tuple):
         f"-outfmt '{args.outfmt}' {args.options_blast}"
     )
 
-    if os.path.isfile(f"{group_tuple[1]}/blast-output.txt"):
-        stdout = "File already exists"
+    file_name = f"{group_tuple[1]}/blast-output.txt"
+
+    if os.path.isfile(file_name):
+        stdout = f"File {file_name} already exists"
         stderr = ""
     else:
         stdout, stderr = execute(job_str)
     print(f"----BLASTn - stdout----\n{stdout}\n----BLASTn - stderr----\n{stderr}\n")
-    if os.path.isfile(f"{group_tuple[1]}/blast-output.txt") and os.path.getsize(
-        f"{group_tuple[1]}/blast-output.txt"
+
+    if os.path.isfile(file_name) and os.path.getsize(
+        file_name
     ):
-        df = pd.read_csv(f"{group_tuple[1]}/blast-output.txt", sep="\t", header=None)
+        df = pd.read_csv(file_name, sep="\t", header=None)
     else:
         df = pd.DataFrame()
     return df
@@ -174,7 +180,7 @@ def execute(command):
 ###########################################################
 
 
-def batch_iterator(iterator, batch_size):
+def batch_iterator(iterator, batch_size, max_len):
     """Returns lists of length batch_size.
 
     This can be used on any iterator, for example to batch up
@@ -197,7 +203,8 @@ def batch_iterator(iterator, batch_size):
             if entry is None:
                 # End of file
                 break
-            batch.append(entry)
+            if max_len and len(entry.seq) <= max_len:
+                batch.append(entry)
         if batch:
             yield batch
 

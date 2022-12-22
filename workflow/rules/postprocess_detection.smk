@@ -1,9 +1,5 @@
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
 
 rule deepvirfinder_postprocess:
@@ -39,10 +35,6 @@ rule deepvirfinder_postprocess:
 
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
 
 rule virsorter_postprocess_step1:
@@ -189,10 +181,6 @@ rule virsorter_postprocess_step2:
 
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
 
 rule extract_deepvirfinder:
@@ -237,10 +225,6 @@ rule extract_deepvirfinder:
 
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
 
 rule combine_virsorter_virfinder:
@@ -341,10 +325,6 @@ rule combine_virsorter_virfinder:
 
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
 
 rule extract_discarded:
@@ -512,73 +492,45 @@ rule merge_annotations:
 ##########################################################################
 
 
-rule combine_all:
+rule extract_putative_virus_blast:
     input:
         tsv_blast=os.path.join(
             OUTPUT_FOLDER,
             "processing_files",
             "blast",
-            "discarded",
-            f"merge.eval_{blast_evalue:.0e}.cov_{blast_coverage}.pident_{blast_pident}.annotation.blasn.tsv",
+            "preprocess",
+            f"merge.eval_{blast_evalue:.0e}.cov_0.85.pident_0.7.annotation.blasn.tsv",
         ),
-        fasta_discarded=os.path.join(
+        contig=os.path.join(
             OUTPUT_FOLDER,
-            "processing_files",
-            "discarded_contig",
-            "{sample}.discarded.fasta",
-        ),
-        fasta_kept=os.path.join(
-            OUTPUT_FOLDER,
-            "processing_files",
-            "combine_virsorter_deepvirfinder",
-            "{sample}.virsorter.deepvirfinder.fasta",
-        ),
-        tsv_kept=os.path.join(
-            OUTPUT_FOLDER,
-            "processing_files",
-            "combine_virsorter_deepvirfinder",
-            "{sample}.virsorter.deepvirfinder.tsv",
-        ),
-        ids_virsorter_keep2_suspicious=os.path.join(
-            OUTPUT_FOLDER,
-            "processing_files",
-            "virsorter",
-            "{sample}",
-            "virsorter_positive.keep2.suspicious.ids",
-        ),
-        ids_virsorter_manual_check=os.path.join(
-            OUTPUT_FOLDER,
-            "processing_files",
-            "virsorter",
-            "{sample}",
-            "virsorter.need_manual_check.ids",
-        ),
-        ids_virsorter_discarded=os.path.join(
-            OUTPUT_FOLDER,
-            "processing_files",
-            "virsorter",
-            "{sample}",
-            "virsorter.discarded.ids",
-        ),        
+            "databases",
+            "contigs",
+            "human_filtered",
+            "{sample}.filtered.sorted.fasta",
+        ),    
     output:
         fasta=os.path.join(
             OUTPUT_FOLDER,
-            "databases",
-            "viral_contigs",
-            "{sample}.selected.fasta",
+            "processing_files",
+            "blast",
+            "preprocess",
+            "selected",
+            "{sample}.preprocess.fasta",
         ),
-        tsv=os.path.join(
+        discarded=os.path.join(
             OUTPUT_FOLDER,
-            "databases",
-            "viral_contigs",
-            "{sample}.selected.tsv",
+            "processing_files",
+            "blast",
+            "preprocess",
+            "discarded",
+            "{sample}.preprocess.fasta",
         ),
     log:
         os.path.join(
             OUTPUT_FOLDER,
             "logs",
-            "postprocess_detection",
-            "{sample}.combine_all.log",
+            "preprocess_detection",
+            "{sample}.extract_putative_virus_blast.log",
         ),
     resources:
         cpus=1,
@@ -586,15 +538,208 @@ rule combine_all:
         "../envs/biopython.yaml"
     threads: 1
     script:
-        "../scripts/combine_all.py"
+        "../scripts/extract_preprocess_blastn.py"
 
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
+
+rule extract_putative_virus_virsorter:
+    input:
+        tsv=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "{sample}",
+            "preprocess",
+            "final-viral-boundary.tsv",
+        ),
+        contig=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "blast",
+            "preprocess",
+            "discarded",
+            "{sample}.preprocess.fasta",
+        ),
+    output:
+        fasta=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "preprocess",
+            "selected",
+            "{sample}.preprocess.fasta",
+        ),
+        discarded=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "preprocess",
+            "discarded",
+            "{sample}.preprocess.fasta",
+        ),
+    log:
+        os.path.join(
+            OUTPUT_FOLDER,
+            "logs",
+            "preprocess_detection",
+            "{sample}.extract_putative_virus_virsorter.log",
+        ),
+    resources:
+        cpus=1,
+    conda:
+        "../envs/biopython.yaml"
+    threads: 1
+    script:
+        "../scripts/extract_preprocess_virsorter.py"
+
+##########################################################################
+##########################################################################
+
+
+rule deepvirfinder_postprocess_putative:
+    input:
+        txt=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "deepvirfinder",
+            "preprocess",
+            "{sample}",
+            "{sample}_gt{cutoff}bp_dvfpred.txt",
+        ),
+    output:
+        txt=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "deepvirfinder",
+            "preprocess",
+            "{sample}",
+            "{sample}.deepvirfinder_positive.gt{cutoff}bp.ids",
+        ),
+    log:
+        os.path.join(
+            OUTPUT_FOLDER,
+            "logs",
+            "deepvirfinder",
+            "preprocess",
+            "{sample}.{cutoff}.deepvirfinder_postprocess.log",
+        ),
+    resources:
+        cpus=1,
+    threads: 1
+    script:
+        "../scripts/deepvirfinder_postprocess.py"
+
+
+##########################################################################
+##########################################################################
+
+rule extract_putative_virus_deepvirfinder:
+    input:
+        ids_virfinder=lambda wildcards: os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "deepvirfinder",
+            "preprocess",
+            wildcards.sample,
+            f"{wildcards.sample}.deepvirfinder_positive.gt2000bp.ids",
+        ),
+        contig=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "preprocess",
+            "discarded",
+            "{sample}.preprocess.fasta",
+        ),
+    output:
+        fasta=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "deepvirfinder",
+            "preprocess",
+            "selected",
+            "{sample}.preprocess.fasta",
+        ),
+        discarded=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "deepvirfinder",
+            "preprocess",
+            "discarded",
+            "{sample}.preprocess.fasta",
+        ),
+    log:
+        os.path.join(
+            OUTPUT_FOLDER,
+            "logs",
+            "deepvirfinder",
+            "preprocess",
+            "{sample}.extract_preprocess_deepvirfinder.log",
+        ),
+    resources:
+        cpus=1,
+    conda:
+        "../envs/biopython.yaml"
+    threads: 1
+    script:
+        "../scripts/extract_preprocess_deepvirfinder.py"
+
+
+##########################################################################
+##########################################################################
+
+rule cat_putative:
+    input:
+        blast=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "blast",
+            "preprocess",
+            "selected",
+            "{sample}.preprocess.fasta",
+        ),
+        virsorter=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "preprocess",
+            "selected",
+            "{sample}.preprocess.fasta",
+        ),
+        deepvirfinder=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "deepvirfinder",
+            "preprocess",
+            "selected",
+            "{sample}.preprocess.fasta",
+        ),        
+    output:
+        fasta=os.path.join(
+            OUTPUT_FOLDER,
+            "databases",
+            "putative_virus",
+            "{sample}.putative_virus.fasta",
+        ),
+    log:
+        os.path.join(
+            OUTPUT_FOLDER,
+            "logs",
+            "cat",
+            "preprocess",
+            "{sample}.cat_putative.log",
+        ),
+    resources:
+        cpus=1,
+    threads: 1
+    shell:
+        "cat {input.blast} {input.virsorter} {input.deepvirfinder} > {output.fasta}"
+
+
+##########################################################################
+##########################################################################
 
 rule merge_blastn:
     input:
@@ -646,19 +791,19 @@ rule merge_blastn:
 # Because right now all the databases have a not similar way of being
 
 
-rule merge_discarded_blastn:
+rule merge_preprocess_blastn:
     input:
         all_out=expand(
             os.path.join(
                 OUTPUT_FOLDER,
                 "processing_files",
                 "blast",
-                "discarded",
+                "preprocess",
                 "{sample}",
                 "{sample}.evalue_{evalue:.0e}.{database}.blastn.outfmt6.txt",
             ),
             sample=CONTIGS_DICT.keys(),
-            database=DB_DICT["discarded"].keys(),
+            database=DB_DICT["fasta"].keys(),
             evalue=[blast_evalue],
         ),
     output:
@@ -666,7 +811,7 @@ rule merge_discarded_blastn:
             OUTPUT_FOLDER,
             "processing_files",
             "blast",
-            "discarded",
+            "preprocess",
             "merge.eval_{evalue}.cov_{coverage}.pident_{pident}.annotation.blasn.tsv",
         ),
     params:
@@ -676,7 +821,7 @@ rule merge_discarded_blastn:
             OUTPUT_FOLDER,
             "logs",
             "blast",
-            "discarded",
+            "preprocess",
             "merge_blastn.eval_{evalue}.cov_{coverage}.pid_{pident}.log",
         ),
     resources:

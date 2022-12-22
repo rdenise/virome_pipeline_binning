@@ -27,13 +27,62 @@ rule virsorter_setup:
         virsorter setup -d {output:q} -j {threads} &> {log:q}
         """
 
+##########################################################################
+##########################################################################
+
+
+rule virsorter_preprocess:
+    input:
+        contig=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "blast",
+            "preprocess",
+            "discarded",
+            "{sample}.preprocess.fasta",
+        ),
+        database=os.path.join(
+            OUTPUT_FOLDER,
+            "databases",
+            "virsorter_db",
+        ),
+    output:
+        boundary=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "{sample}",
+            "preprocess",
+            "final-viral-boundary.tsv",
+        ),
+    params:
+        output_dir=os.path.join(
+            OUTPUT_FOLDER,
+            "processing_files",
+            "virsorter",
+            "{sample}",
+            "preprocess",
+        ),
+        cutoff=4000,
+    log:
+        os.path.join(
+            OUTPUT_FOLDER, "logs", "virsorter", "preprocess", "{sample}.preprocess.log"
+        ),
+    resources:
+        cpus=5,
+    conda:
+        "../envs/virsorter.yaml"
+    threads: 5
+    shell:
+        """
+        virsorter run --keep-original-seq -i {input.contig:q} -w {params.output_dir:q} \
+        --include-groups "dsDNAphage,ssDNA" --min-length {params.cutoff} \
+        --min-score 0.5 -j {threads} all &> {log:q}
+        """
+
 
 ##########################################################################
 ##########################################################################
-# NOTES:
-# 1. Need to think about doing the pipeline one contig by one contif or merge (as Andrey does)
-# 2. In the config file or in another tabulated file have the path to all the database fasta file
-# Because right now all the databases have a not similar way of being
 
 
 rule virsorter_run_step1:

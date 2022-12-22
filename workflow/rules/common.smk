@@ -27,51 +27,51 @@ def get_final_output(outdir, contigs_list):
     final_output = []
 
     # Taxonomic annotation
-    final_output += (
-        os.path.join(outdir, "results", "taxonomic_annotation_contigs.tsv"),
-    )
+    # final_output += (
+    #     os.path.join(outdir, "results", "taxonomic_annotation_contigs.tsv"),
+    # )
 
-    # Vcontact file
-    final_output += (
-        os.path.join(
-            outdir,
-            "processing_files",
-            "vcontact2",
-            "genome_by_genome_overview.csv",
-        ),
-    )
+    # # Vcontact file
+    # final_output += (
+    #     os.path.join(
+    #         outdir,
+    #         "processing_files",
+    #         "vcontact2",
+    #         "genome_by_genome_overview.csv",
+    #     ),
+    # )
 
-    # pVOG and PHROG proteins
-    final_output += (
-        os.path.join(
-            outdir,
-            "processing_files",
-            "hmmer",
-            f"significant_hit.full_{hmm_evalue_full:.0e}.dom_{hmm_evalue_dom}.domtblout.txt",
-        ),
-    )
+    # # pVOG and PHROG proteins
+    # final_output += (
+    #     os.path.join(
+    #         outdir,
+    #         "processing_files",
+    #         "hmmer",
+    #         f"significant_hit.full_{hmm_evalue_full:.0e}.dom_{hmm_evalue_dom}.domtblout.txt",
+    #     ),
+    # )
 
-    # Dramv distill
-    final_output += expand(
-        os.path.join(outdir, "results", "dramv", "distill", "{sample}", "product.html"),
-        sample=contigs_list,
-    )
+    # # Dramv distill
+    # final_output += expand(
+    #     os.path.join(outdir, "results", "dramv", "distill", "{sample}", "product.html"),
+    #     sample=contigs_list,
+    # )
 
-    # Mapping of the reads
-    final_output += (
-        os.path.join(
-            outdir,
-            "results",
-            "mapping",
-            "otu_total_sum_normalised.tsv",
-        ),
-    )
+    # # Mapping of the reads
+    # final_output += (
+    #     os.path.join(
+    #         outdir,
+    #         "results",
+    #         "mapping",
+    #         "otu_total_sum_normalised.tsv",
+    #     ),
+    # )
 
-    # Iphop results
-    final_output += expand(
-        os.path.join(outdir, "results", "iphop", "{sample}"),
-        sample=contigs_list,
-    )    
+    # # Iphop results
+    # final_output += expand(
+    #     os.path.join(outdir, "results", "iphop", "{sample}"),
+    #     sample=contigs_list,
+    # )    
 
     # final_output += expand(
     #     os.path.join(
@@ -85,6 +85,12 @@ def get_final_output(outdir, contigs_list):
     #     ),
     #     sample=contigs_list,
     # )
+
+    # All putative virus
+    final_output += expand(
+        os.path.join(outdir, "databases", "putative_virus", "{sample}.putative_virus.fasta"),
+        sample=contigs_list,
+    )
 
     return final_output
 
